@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0  # 使用官方 MySQL 镜像
+    container_name: mysql_container
+    environment:
+      MYSQL_ROOT_PASSWORD: root  # 设置 MySQL 根用户密码
+    ports:
+      - "3306:3306"  # 映射端口
