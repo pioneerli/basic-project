@@ -4,6 +4,7 @@ import (
 	"basic-project/internal/domain"
 	"basic-project/internal/repository/dao"
 	"context"
+	"github.com/gin-gonic/gin"
 )
 
 var (
@@ -37,10 +38,34 @@ func (repo *UserRepository) FindByEmail(ctx context.Context, email interface{}) 
 	return repo.toDomain(u), nil
 }
 
+func (repo *UserRepository) FindByNickName(ctx context.Context, nickName interface{}) (domain.User, error) {
+	u, err := repo.dao.FindByEmail(ctx, nickName)
+
+	if err != nil {
+		return domain.User{}, err
+	}
+	return repo.toDomain(u), nil
+}
+
 func (repo *UserRepository) toDomain(u dao.User) domain.User {
 	return domain.User{
 		Id:       u.Id,
 		Email:    u.Email,
 		Password: u.Password,
+	}
+}
+
+func (repo *UserRepository) UpdateNonZeroFields(ctx *gin.Context, user domain.User) error {
+	return repo.dao.UpdateById(ctx, repo.toEntity(user))
+}
+
+func (repo *UserRepository) toEntity(u domain.User) dao.User {
+	return dao.User{
+		Id:       u.Id,
+		Email:    u.Email,
+		Password: u.Password,
+		Birthday: u.Birthday.UnixMilli(),
+		AboutMe:  u.AboutMe,
+		Nickname: u.Nickname,
 	}
 }

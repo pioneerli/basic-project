@@ -5,6 +5,7 @@ import (
 	"basic-project/internal/repository"
 	"context"
 	"errors"
+	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 	"strings"
 )
@@ -46,4 +47,8 @@ func (svc *UserService) Login(ctx context.Context, email string, password string
 		return domain.User{}, ErrInvalidUserOrPassword
 	}
 	return u, nil
+}
+
+func (svc *UserService) UpdateNonSensitiveInfo(ctx *gin.Context, user domain.User) error {
+	return svc.repo.UpdateNonZeroFields(ctx, user)
 }

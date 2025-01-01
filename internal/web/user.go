@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"regexp"
+	"time"
 )
 
 type UserHandler struct {
@@ -96,6 +97,44 @@ func (h *UserHandler) Login(ctx *gin.Context) {
 }
 
 func (h *UserHandler) Edit(ctx *gin.Context) {
+
+	type Req struct {
+		Nickname string `json:"nickname"`
+		Birthday string `json:"birthday"`
+		AboutMe  string `json:"aboutme"`
+		Id       int64  `json:"id"`
+	}
+	var req Req
+	if err := ctx.Bind(&req); err != nil {
+		return
+	}
+	//u, err := h.svc.Login(ctx, req.Email, req.Password)
+	//fmt.Println("u", u)
+
+	//birthday, err := time.Parse(time.DateOnly, req.Birthday)
+
+	//birthday, err := time.Parse(time.DateOnly, req.Birthday)
+
+	// 定义时间格式
+	layout := "2006-01-02 15:04:05"
+
+	// 将字符串转换为 time.Time
+	birthday, err := time.Parse(layout, req.Birthday)
+	if err != nil {
+		ctx.String(500, "birthday parse error")
+	}
+	err = h.svc.UpdateNonSensitiveInfo(ctx,
+		domain.User{
+			Id:       req.Id,
+			Nickname: req.Nickname,
+			Birthday: birthday,
+			AboutMe:  req.AboutMe,
+		})
+
+	if err != nil {
+		ctx.String(http.StatusOK, "系统异常")
+	}
+	ctx.String(http.StatusOK, "更新成功")
 
 }
 
